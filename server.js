@@ -9,6 +9,7 @@ const path = require('path');
 const app = express();
 const upload = multer({ dest: 'mods/' });
 
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: 'gta-mod-secret',
@@ -16,25 +17,18 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// Redirect homepage to mods.html
-app.get('/', (req, res) => {
-  res.redirect('/mods.html');
-});
-
-// Serve public files (excluding upload.html)
-app.use(express.static('public', {
-  index: false,
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('upload.html')) {
-      res.status(403).end('Access denied');
-    }
-  }
-}));
+// Serve static files from public folder
+app.use(express.static('public'));
 
 // Serve mod files
 app.use('/mods', express.static('mods'));
 
-// Serve mod list
+// Homepage: serve index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+// Serve mod list as JSON
 app.get('/mods', (req, res) => {
   fs.readFile('mods.json', 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error loading mods');
