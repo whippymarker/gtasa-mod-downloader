@@ -1,0 +1,16 @@
+[
+  {
+    "id": "super-car",
+    "name": "Super Car Mod",
+    "description": "Replaces Infernus with a Lamborghini.",
+    "thumbnail": "assets/images/super-car.jpg",
+    "download": "/mods/super-car.zip"
+  },
+  {
+    "id": "br-cars",
+    "name": "Brazilian Cars",
+    "description": "Brazilian Cars for GTA:SA",
+    "thumbnail": "assets/images/brcars.jpg",
+    "download": "/mods/92a39f546787835de7f0a68f6fbc984b.zip"
+  }
+]

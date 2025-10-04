@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Mod</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <h2>Upload a New Mod</h2>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="text" name="name" placeholder="Mod Name" required><br>
+    <input type="text" name="description" placeholder="Description" required><br>
+    <input type="text" name="id" placeholder="Unique ID (e.g. car-mod)" required><br>
+    <input type="text" name="thumbnail" placeholder="Thumbnail Path (e.g. assets/images/car.jpg)" required><br>
+    <input type="file" name="modFile" accept=".zip" required><br>
+    <button type="submit">Upload Mod</button>
+  </form>
+</body>
+</html>
