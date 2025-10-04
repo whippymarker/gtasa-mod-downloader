@@ -66,8 +66,8 @@ app.get('/upload', (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'jhonatanmotta4123@gmail.com',       // Replace with your email
-    pass: 'xict jtyo xicw fsbs'           // Use an app password if using Gmail
+    user: 'jhonatanmotta4123@gmail.com',
+    pass: 'xict jtyo xicw fsbs'
   }
 });
 
@@ -86,27 +86,41 @@ app.post('/upload', (req, res, next) => {
       const mods = err ? [] : JSON.parse(data);
       mods.push({ id, name, description, thumbnail, download: modPath });
       fs.writeFile('mods.json', JSON.stringify(mods, null, 2), () => {
-        // Send email notification
         const mailOptions = {
           from: 'your.email@gmail.com',
           to: 'your.email@gmail.com',
           subject: `New Mod Uploaded: ${name}`,
-          html: `
-            <h2>${name}</h2>
-            <p>${description}</p>
-            <p><a href="http://localhost:3000${modPath}">Download Mod</a></p>
-          `
+          html: `<h2>${name}</h2><p>${description}</p><p><a href="http://localhost:3000${modPath}">Download Mod</a></p>`
         };
-
         transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            console.error('Email failed:', error);
-          } else {
-            console.log('Email sent:', info.response);
-          }
+          if (error) console.error('Email failed:', error);
+          else console.log('Email sent:', info.response);
         });
-
         res.redirect('/mods.html');
+      });
+    });
+  });
+});
+
+// 🔐 Protected delete route
+app.delete('/delete/:id', (req, res, next) => {
+  if (!req.session.loggedIn) {
+    return res.status(403).send('Access denied. Please log in.');
+  }
+  next();
+}, (req, res) => {
+  const modId = req.params.id;
+  fs.readFile('mods.json', 'utf8', (err, data) => {
+    if (err) return res.status(500).send('Error reading mods');
+    let mods = JSON.parse(data);
+    const mod = mods.find(m => m.id === modId);
+    if (!mod) return res.status(404).send('Mod not found');
+
+    const zipPath = path.join(__dirname, mod.download.replace('/', path.sep));
+    fs.unlink(zipPath, () => {
+      mods = mods.filter(m => m.id !== modId);
+      fs.writeFile('mods.json', JSON.stringify(mods, null, 2), () => {
+        res.send('Mod deleted successfully');
       });
     });
   });

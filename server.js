@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const session = require('express-session');
@@ -8,13 +9,17 @@ const path = require('path');
 const app = express();
 const upload = multer({ dest: 'mods/' });
 
-// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: 'gta-mod-secret',
   resave: false,
   saveUninitialized: true
 }));
+
+// Redirect homepage to mods.html
+app.get('/', (req, res) => {
+  res.redirect('/mods.html');
+});
 
 // Serve public files (excluding upload.html)
 app.use(express.static('public', {
@@ -66,8 +71,8 @@ app.get('/upload', (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'your.email@gmail.com',
-    pass: 'your-app-password'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
@@ -87,10 +92,10 @@ app.post('/upload', (req, res, next) => {
       mods.push({ id, name, description, thumbnail, download: modPath });
       fs.writeFile('mods.json', JSON.stringify(mods, null, 2), () => {
         const mailOptions = {
-          from: 'your.email@gmail.com',
-          to: 'your.email@gmail.com',
+          from: process.env.EMAIL_USER,
+          to: process.env.EMAIL_USER,
           subject: `New Mod Uploaded: ${name}`,
-          html: `<h2>${name}</h2><p>${description}</p><p><a href="http://localhost:3000${modPath}">Download Mod</a></p>`
+          html: `<h2>${name}</h2><p>${description}</p><p><a href="${modPath}">Download Mod</a></p>`
         };
         transporter.sendMail(mailOptions, (error, info) => {
           if (error) console.error('Email failed:', error);
@@ -102,7 +107,7 @@ app.post('/upload', (req, res, next) => {
   });
 });
 
-// 🔐 Protected delete route
+// Protected delete route
 app.delete('/delete/:id', (req, res, next) => {
   if (!req.session.loggedIn) {
     return res.status(403).send('Access denied. Please log in.');
@@ -127,6 +132,7 @@ app.delete('/delete/:id', (req, res, next) => {
 });
 
 // Start server
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });

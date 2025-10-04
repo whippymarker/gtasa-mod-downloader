@@ -1,1 +1,3 @@
-mods/*.zip 
+mods/*.zip
+node_modules/
+.env

@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch('/mods')
     .then(res => res.json())
     .then(mods => {
-      // mods.html
       if (modListContainer) {
         mods.forEach(mod => {
           const card = document.createElement('div');
@@ -22,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // mod-details.html
       if (modDetailsContainer) {
         const params = new URLSearchParams(window.location.search);
         const modId = params.get('id');
@@ -47,10 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Delete mod function
 function deleteMod(id) {
   if (confirm('Are you sure you want to delete this mod?')) {
-    fetch(`/delete/${id}`, { method: 'DELETE' })
+    fetch(`/delete/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
       .then(res => res.text())
       .then(msg => {
         alert(msg);
